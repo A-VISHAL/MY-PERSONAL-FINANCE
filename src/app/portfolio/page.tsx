@@ -27,7 +27,11 @@ export default function PortfolioPage() {
         if (marketData.length === 0 || isLoading) return;
 
         const fetchRealPrices = async () => {
-            const apiKey = 'KNRUC6N83ZIHLNRT';
+            const apiKey = process.env.NEXT_PUBLIC_ALPHA_VANTAGE_KEY;
+            if (!apiKey) {
+                console.warn('Alpha Vantage API key is missing');
+                return;
+            }
             const updatedMarketData = [...marketData];
             let changed = false;
 
