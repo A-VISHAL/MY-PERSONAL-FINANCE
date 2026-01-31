@@ -12,10 +12,13 @@ export default function AnalyzePage() {
     const handleAnalysis = async (formData: any) => {
         setIsLoading(true);
         try {
+            const savedPortfolio = localStorage.getItem('carbon_portfolio');
+            const portfolioData = savedPortfolio ? JSON.parse(savedPortfolio) : [];
+
             const response = await fetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ ...formData, portfolioData }),
             });
             const data = await response.json();
             setResults(data);
@@ -36,8 +39,8 @@ export default function AnalyzePage() {
         <main className="min-h-screen pb-20">
             <Navbar />
 
-            <section className="pt-32 pb-20 px-6">
-                <div className="container mx-auto">
+            <section className="pt-32 pb-20 px-4 md:px-12">
+                <div className="w-full">
                     {!results && (
                         <div className="text-center mb-16 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <h1 className="text-4xl md:text-5xl font-bold mb-6 tracking-tight">
@@ -56,8 +59,8 @@ export default function AnalyzePage() {
 
             {/* Results Section */}
             {results && (
-                <section id="dashboard" className="px-6 py-20 bg-black/20">
-                    <div className="container mx-auto">
+                <section id="dashboard" className="px-4 md:px-12 py-20 bg-black/20">
+                    <div className="w-full">
                         <div className="mb-12">
                             <h2 className="text-3xl font-bold">Your Financial Blueprint</h2>
                             <p className="text-gray-400">Generated on {new Date().toLocaleDateString()}</p>

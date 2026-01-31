@@ -15,9 +15,16 @@ export default function FinancialForm({ onSubmit, isLoading }: FinancialFormProp
         city: 'metro',
         risk: 'moderate',
         goals: [] as string[],
-        rent: '',
-        expenses: '',
-        existingInvestments: ''
+        fixedExpenses: '',
+        variableExpenses: '',
+        hasEmergencyFund: 'no',
+        emergencyFundAmount: '',
+        dependents: '0',
+        monthlyEMI: '',
+        currentDebts: '',
+        existingLifeCover: '',
+        existingHealthCover: '',
+        currentMonthlyInvestment: ''
     });
 
     const goalsList = [
@@ -44,14 +51,20 @@ export default function FinancialForm({ onSubmit, isLoading }: FinancialFormProp
             ...formData,
             salary: Number(formData.salary),
             age: Number(formData.age),
-            rent: Number(formData.rent) || 0,
-            expenses: Number(formData.expenses) || 0,
-            existingInvestments: Number(formData.existingInvestments) || 0
+            fixedExpenses: Number(formData.fixedExpenses),
+            variableExpenses: Number(formData.variableExpenses),
+            emergencyFundAmount: Number(formData.emergencyFundAmount) || 0,
+            dependents: Number(formData.dependents),
+            monthlyEMI: Number(formData.monthlyEMI) || 0,
+            currentDebts: Number(formData.currentDebts) || 0,
+            existingLifeCover: Number(formData.existingLifeCover) || 0,
+            existingHealthCover: Number(formData.existingHealthCover) || 0,
+            currentMonthlyInvestment: Number(formData.currentMonthlyInvestment) || 0
         });
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-8 rounded-3xl border border-white/10 bg-card/50 backdrop-blur-xl shadow-2xl relative overflow-hidden">
+        <div className="w-full p-8 md:p-16 lg:p-20 rounded-[40px] border border-white/10 bg-card/50 backdrop-blur-xl shadow-2xl relative overflow-hidden">
             {/* Background Decor */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -z-10 transform translate-x-1/2 -translate-y-1/2"></div>
 
@@ -77,7 +90,7 @@ export default function FinancialForm({ onSubmit, isLoading }: FinancialFormProp
                                     type="number"
                                     required
                                     min="5000"
-                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
                                     placeholder="80000"
                                     value={formData.salary}
                                     onChange={e => setFormData({ ...formData, salary: e.target.value })}
@@ -86,43 +99,190 @@ export default function FinancialForm({ onSubmit, isLoading }: FinancialFormProp
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm text-gray-400">Age</label>
-                            <input
-                                type="number"
-                                required
-                                min="18"
-                                max="80"
-                                className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all"
-                                placeholder="25"
-                                value={formData.age}
-                                onChange={e => setFormData({ ...formData, age: e.target.value })}
-                            />
+                            <label className="text-sm text-gray-400">Monthly Fixed Expenses (Rent, EMI, School)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    required
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="30000"
+                                    value={formData.fixedExpenses}
+                                    onChange={e => setFormData({ ...formData, fixedExpenses: e.target.value })}
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm text-gray-400">City Tier</label>
-                            <select
-                                className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
-                                value={formData.city}
-                                onChange={e => setFormData({ ...formData, city: e.target.value })}
-                            >
-                                <option value="metro">Metro (Tier 1)</option>
-                                <option value="tier2">Tier 2 City</option>
-                                <option value="tier3">Tier 3 / Rural</option>
-                            </select>
+                            <label className="text-sm text-gray-400">Monthly Variable Expenses (Food, Medical)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    required
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="15000"
+                                    value={formData.variableExpenses}
+                                    onChange={e => setFormData({ ...formData, variableExpenses: e.target.value })}
+                                />
+                            </div>
                         </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm text-gray-400">Age</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="18"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="25"
+                                    value={formData.age}
+                                    onChange={e => setFormData({ ...formData, age: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm text-gray-400">Dependents</label>
+                                <input
+                                    type="number"
+                                    required
+                                    min="0"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="2"
+                                    value={formData.dependents}
+                                    onChange={e => setFormData({ ...formData, dependents: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Emergency Fund Saved?</label>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, hasEmergencyFund: 'yes' })}
+                                    className={`py-3 rounded-xl border transition-all text-sm font-bold ${formData.hasEmergencyFund === 'yes' ? 'bg-primary/20 border-primary text-white' : 'bg-secondary/50 border-white/10 text-gray-400'}`}
+                                >
+                                    YES
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, hasEmergencyFund: 'no' })}
+                                    className={`py-3 rounded-xl border transition-all text-sm font-bold ${formData.hasEmergencyFund === 'no' ? 'bg-primary/20 border-primary text-white' : 'bg-secondary/50 border-white/10 text-gray-400'}`}
+                                >
+                                    NO
+                                </button>
+                            </div>
+                        </div>
+
+                        {formData.hasEmergencyFund === 'yes' && (
+                            <div className="space-y-2">
+                                <label className="text-sm text-gray-400">Emergency Fund Amount</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                    <input
+                                        type="number"
+                                        required
+                                        className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                        placeholder="200000"
+                                        value={formData.emergencyFundAmount}
+                                        onChange={e => setFormData({ ...formData, emergencyFundAmount: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        )}
 
                         <div className="space-y-2">
                             <label className="text-sm text-gray-400">Risk Appetite</label>
                             <select
-                                className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/50 transition-all appearance-none"
+                                className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/50 transition-all appearance-none"
                                 value={formData.risk}
                                 onChange={e => setFormData({ ...formData, risk: e.target.value as any })}
                             >
-                                <option value="conservative">Conservative (Safe Plays)</option>
+                                <option value="conservative">Conservative (Safe)</option>
                                 <option value="moderate">Moderate (Balanced)</option>
-                                <option value="aggressive">Aggressive (High Growth)</option>
+                                <option value="aggressive">Aggressive (Growth)</option>
                             </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Section 2: Debt & Protection (New) */}
+                <div className="space-y-4">
+                    <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-4">
+                        <Shield size={20} />
+                        <h3>Debt & Protection</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Monthly EMI Payments</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="15000"
+                                    value={formData.monthlyEMI}
+                                    onChange={e => setFormData({ ...formData, monthlyEMI: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Total Outstanding Debt (Home, Car, Personal)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="2000000"
+                                    value={formData.currentDebts}
+                                    onChange={e => setFormData({ ...formData, currentDebts: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Existing Life Insurance (Sum Assured)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="5000000"
+                                    value={formData.existingLifeCover}
+                                    onChange={e => setFormData({ ...formData, existingLifeCover: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm text-gray-400">Existing Health Insurance Cover</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="500000"
+                                    value={formData.existingHealthCover}
+                                    onChange={e => setFormData({ ...formData, existingHealthCover: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2 lg:col-span-2">
+                            <label className="text-sm text-gray-400">Total Current Monthly Investments (SIPs, RD, etc.)</label>
+                            <div className="relative">
+                                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">₹</span>
+                                <input
+                                    type="number"
+                                    className="w-full bg-secondary/50 border border-white/10 rounded-xl px-4 py-3 pl-8 focus:outline-none focus:border-primary/50 transition-all font-mono"
+                                    placeholder="10000"
+                                    value={formData.currentMonthlyInvestment}
+                                    onChange={e => setFormData({ ...formData, currentMonthlyInvestment: e.target.value })}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,8 +301,8 @@ export default function FinancialForm({ onSubmit, isLoading }: FinancialFormProp
                                 type="button"
                                 onClick={() => handleGoalToggle(goal.id)}
                                 className={`flex flex-col items-center p-4 rounded-xl border transition-all ${formData.goals.includes(goal.id)
-                                        ? 'bg-primary/20 border-primary text-white'
-                                        : 'bg-secondary/30 border-white/5 text-gray-400 hover:bg-secondary/50'
+                                    ? 'bg-primary/20 border-primary text-white'
+                                    : 'bg-secondary/30 border-white/5 text-gray-400 hover:bg-secondary/50'
                                     }`}
                             >
                                 <span className="text-2xl mb-2">{goal.icon}</span>

@@ -78,7 +78,7 @@ export default function CalculatorsPage() {
         <main className="min-h-screen pb-20 bg-background text-white">
             <Navbar />
 
-            <div className="pt-32 px-6 container mx-auto">
+            <div className="pt-32 px-4 md:px-12 w-full">
                 <div className="mb-12">
                     <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
                         {calculatorOptions.find(c => c.name === selectedCalc)?.icon}
