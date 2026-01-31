@@ -73,9 +73,9 @@ export default function Navbar() {
                         </div>
                     </div>
 
-                    <Link href="/#analyze" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Analyze</Link>
+                    <Link href="/analyze" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Analyze</Link>
                     <Link href="/#features" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Features</Link>
-                    <Link href="/#dashboard" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Dashboard</Link>
+                    <Link href="/analyze" className="text-sm font-medium text-gray-400 hover:text-white transition-colors">Dashboard</Link>
                 </div>
 
                 <button className="hidden md:flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 hover:bg-white/5 transition-colors text-sm font-medium">

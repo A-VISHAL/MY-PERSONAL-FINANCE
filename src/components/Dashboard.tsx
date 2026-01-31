@@ -15,6 +15,7 @@ export default function Dashboard({ data }: DashboardProps) {
     const [selectedStock, setSelectedStock] = useState<any>(null);
     const [portfolio, setPortfolio] = useState<any[]>([]);
     const [buyModal, setBuyModal] = useState({ isOpen: false, stock: null as any, quantity: 1 });
+    const [notification, setNotification] = useState<{ isOpen: boolean; message: string } | null>(null);
 
     useEffect(() => {
         const saved = localStorage.getItem('carbon_portfolio');
@@ -42,7 +43,13 @@ export default function Dashboard({ data }: DashboardProps) {
         setPortfolio(updated);
         localStorage.setItem('carbon_portfolio', JSON.stringify(updated));
         setBuyModal({ isOpen: false, stock: null, quantity: 1 });
-        alert(`Successfully bought ${buyModal.quantity} shares of ${buyModal.stock.ticker}. View in your Portfolio.`);
+        setNotification({
+            isOpen: true,
+            message: `Successfully bought ${buyModal.quantity} shares of ${buyModal.stock.ticker}. View in your Portfolio.`
+        });
+
+        // Auto hide after 5 seconds
+        setTimeout(() => setNotification(null), 5000);
     };
 
     if (!data) return null;
@@ -67,6 +74,27 @@ export default function Dashboard({ data }: DashboardProps) {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700 relative">
+
+            {/* Premium Success Notification */}
+            {notification && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in fade-in zoom-in duration-300">
+                    <div className="bg-[#1a1a25]/90 border border-emerald-500/30 rounded-2xl p-4 pr-6 flex items-center gap-4 shadow-2xl backdrop-blur-xl">
+                        <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                            <CheckCircle size={24} />
+                        </div>
+                        <div className="space-y-1">
+                            <h4 className="text-white font-bold text-sm">Purchase Successful</h4>
+                            <p className="text-gray-400 text-xs">{notification.message}</p>
+                        </div>
+                        <button
+                            onClick={() => setNotification(null)}
+                            className="ml-4 p-1 hover:bg-white/5 rounded-lg transition-colors text-gray-500 hover:text-white"
+                        >
+                            <X size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Stock Forecast Modal */}
             {selectedStock && (
