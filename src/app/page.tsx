@@ -20,7 +20,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-background selection:bg-primary/30">
+    <main className="min-h-screen bg-[#050505] text-white selection:bg-primary/30">
       <Navbar />
 
       {/* Hero Section */}
@@ -122,7 +122,7 @@ export default function Home() {
             <div className="relative z-10 max-w-2xl">
               <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to take control?</h2>
               <p className="text-lg text-white/80 mb-10 leading-relaxed">
-                Join thousands of smart investors who use WealthWiseAI to outsmart the market
+                Join thousands of smart investors who use WealthWiseAI to outplay the market
                 and retire years earlier.
               </p>
               <Link href="/analyze" className="px-10 py-5 bg-white text-primary font-black rounded-2xl hover:bg-gray-100 transition-all inline-block hover:scale-105 active:scale-95 shadow-xl">
