@@ -53,7 +53,7 @@ export default function AnalyzePage() {
     };
 
     return (
-        <main className="min-h-screen pb-20 bg-[#050505] text-white">
+        <main className="min-h-screen pb-20 bg-white text-slate-900">
             <Navbar />
 
             {/* Hero / Input Section */}
@@ -62,15 +62,15 @@ export default function AnalyzePage() {
                     {!results && (
                         <div className="text-center mb-16 max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
                             {quote && (
-                                <div className="inline-block mb-6 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm">
-                                    <p className="text-sm text-gray-300 italic">✨ "{quote}"</p>
+                                <div className="inline-block mb-6 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 backdrop-blur-sm">
+                                    <p className="text-sm text-slate-500 italic">✨ "{quote}"</p>
                                 </div>
                             )}
-                            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                            <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight text-slate-900">
                                 Analyze Your <br />
                                 <span className="text-gradient">Wealth Strategy</span>
                             </h1>
-                            <p className="text-xl text-gray-400 leading-relaxed">
+                            <p className="text-xl text-slate-500 leading-relaxed">
                                 AI-powered wealth management tailored to your life goals.
                                 Get institutional-grade analysis in seconds.
                             </p>
@@ -83,11 +83,11 @@ export default function AnalyzePage() {
 
             {/* Results Section */}
             {results && (
-                <section id="dashboard" className="px-6 py-20 bg-black/20">
+                <section id="dashboard" className="px-6 py-20 bg-slate-50 border-t border-slate-200">
                     <div className="container mx-auto">
                         <div className="mb-12">
-                            <h2 className="text-3xl font-bold">Your Financial Blueprint</h2>
-                            <p className="text-gray-400">Generated on {new Date().toLocaleDateString()}</p>
+                            <h2 className="text-3xl font-bold text-slate-900">Your Financial Blueprint</h2>
+                            <p className="text-slate-500">Generated on {new Date().toLocaleDateString()}</p>
                         </div>
 
                         <Dashboard data={results} userData={userData} />
