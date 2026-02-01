@@ -9,12 +9,110 @@ interface UserData {
   rent?: number;
   expenses?: number;
   existingInvestments?: number;
+  existingTermCover?: number;
+  existingHealthCover?: number;
+  existingSavings?: number;
+  existingSIP?: number;
+}
+
+// 🧮 Financial Discipline Engine
+function calculateFinancialDiscipline(userData: UserData) {
+  let disciplineScore = 0;
+  const components = {
+    incomeStability: 0,
+    expenseControl: 0,
+    savingsConsistency: 0,
+    debtBehaviour: 0,
+    investmentBehaviour: 0
+  };
+
+  // 1️⃣ Income Stability (20 points)
+  if (userData.salary > 50000) {
+    components.incomeStability = 20;
+  } else if (userData.salary > 25000) {
+    components.incomeStability = 15;
+  } else {
+    components.incomeStability = 10;
+  }
+
+  // 2️⃣ Expense Control (20 points)
+  const expenseRatio = (userData.expenses || userData.salary * 0.8) / userData.salary;
+  if (expenseRatio < 0.6) {
+    components.expenseControl = 20;
+  } else if (expenseRatio < 0.8) {
+    components.expenseControl = 15;
+  } else {
+    components.expenseControl = 8;
+  }
+
+  // 3️⃣ Savings Consistency (25 points) - CORE
+  const savingsRate = ((userData.salary - (userData.expenses || userData.salary * 0.8)) / userData.salary);
+  if (savingsRate > 0.25) {
+    components.savingsConsistency = 25;
+  } else if (savingsRate > 0.15) {
+    components.savingsConsistency = 20;
+  } else if (savingsRate > 0.05) {
+    components.savingsConsistency = 12;
+  } else {
+    components.savingsConsistency = 5;
+  }
+
+  // 4️⃣ Debt Behaviour (15 points)
+  if (expenseRatio < 0.7) {
+    components.debtBehaviour = 15;
+  } else if (expenseRatio < 0.85) {
+    components.debtBehaviour = 10;
+  } else {
+    components.debtBehaviour = 5;
+  }
+
+  // 5️⃣ Investment Behaviour (20 points)
+  if (userData.existingSIP && userData.existingSIP > 0) {
+    components.investmentBehaviour = 20;
+  } else if (userData.existingInvestments && userData.existingInvestments > 0) {
+    components.investmentBehaviour = 15;
+  } else {
+    components.investmentBehaviour = 8;
+  }
+
+  disciplineScore = Object.values(components).reduce((sum, score) => sum + score, 0);
+  return { disciplineScore, components };
+}
+
+// 🔗 Apply Discipline-Based Adjustments
+function applyDisciplineAdjustments(data: any, disciplineScore: number, originalRisk: string) {
+  let adjustedRisk = originalRisk;
+  let disciplineMultiplier = 1.0;
+  let insurancePriority = "MEDIUM";
+  
+  // 1️⃣ Risk Appetite Adjustment
+  if (disciplineScore < 50 && originalRisk === 'aggressive') {
+    adjustedRisk = 'moderate';
+  }
+  
+  // 2️⃣ Insurance Priority
+  if (disciplineScore < 60) {
+    insurancePriority = "HIGH";
+  }
+  
+  // 3️⃣ Final Score Multiplier
+  if (disciplineScore >= 80) {
+    disciplineMultiplier = 1.1;
+  } else if (disciplineScore < 50) {
+    disciplineMultiplier = 0.9;
+  }
+  
+  return { adjustedRisk, disciplineMultiplier, insurancePriority };
 }
 
 export async function POST(request: Request) {
   try {
     const data: UserData = await request.json();
     const { salary, age, risk } = data;
+
+    // 🧮 STEP 1: Calculate Financial Discipline (NEW)
+    const { disciplineScore, components } = calculateFinancialDiscipline(data);
+    const { adjustedRisk, disciplineMultiplier, insurancePriority } = applyDisciplineAdjustments(data, disciplineScore, risk);
 
     // --- 1. Budgeting Logic (50-30-20 Rule Modified) ---
     const needs = salary * 0.5;
@@ -55,13 +153,13 @@ export async function POST(request: Request) {
       riders: ["Critical Illness Rider", "Waiver of Premium"]
     };
 
-    // --- 3. Investment Portfolio ---
+    // --- 3. Investment Portfolio (Using Adjusted Risk) ---
     let portfolioAllocation = {};
-    if (risk === 'aggressive') {
+    if (adjustedRisk === 'aggressive') {
       portfolioAllocation = {
         equity: 50, mutualFunds: 25, indexFunds: 10, gold: 5, fixedIncome: 5, crypto: 5
       };
-    } else if (risk === 'moderate') {
+    } else if (adjustedRisk === 'moderate') {
       portfolioAllocation = {
         equity: 30, mutualFunds: 30, indexFunds: 20, gold: 10, fixedIncome: 10, crypto: 0
       };
@@ -71,10 +169,19 @@ export async function POST(request: Request) {
       };
     }
 
+    // Apply discipline-based equity cap
+    if (disciplineScore < 60) {
+      const equityReduction = Math.max(0, (portfolioAllocation as any).equity - 25);
+      (portfolioAllocation as any).equity -= equityReduction;
+      (portfolioAllocation as any).fixedIncome += equityReduction;
+    }
+
     const investmentPortfolio = {
-      riskProfile: risk,
+      riskProfile: adjustedRisk,
+      originalRisk: risk, // Keep original for comparison
       allocation: portfolioAllocation,
-      totalMonthlyInvestment: savings // Assuming all savings go to investment for simplicity
+      totalMonthlyInvestment: savings,
+      disciplineAdjusted: adjustedRisk !== risk
     };
 
     // --- 4. Stock Recommendations & Forecasting Engine ---
@@ -175,23 +282,45 @@ export async function POST(request: Request) {
       stockComparison: stockRecommendations.map(s => ({ name: s.ticker, price: s.price }))
     };
 
-    // --- 8. Next Actions ---
+    // --- 8. Next Actions (Discipline-Aware) ---
     const nextActions = [
       "Open a Demat account if you haven't already.",
       `Start an SIP of ₹${Math.round(savings)} immediately.`,
-      "Purchase Term Insurance within this month.",
+      disciplineScore < 60 ? "Purchase Term Insurance within this month (Priority: HIGH)." : "Purchase Term Insurance within this month.",
       "Set up an Emergency Fund in a Liquid Fund."
     ];
 
+    // Add discipline-specific actions
+    if (disciplineScore < 50) {
+      nextActions.unshift("Focus on building consistent financial habits before aggressive investing.");
+    }
+
     const response = {
+      // 🆕 Financial Discipline Data
+      financialDiscipline: {
+        score: disciplineScore,
+        components,
+        level: disciplineScore >= 80 ? 'Highly Disciplined' : disciplineScore >= 60 ? 'Moderately Disciplined' : disciplineScore >= 40 ? 'Weak Discipline' : 'Undisciplined',
+        adjustments: {
+          riskAdjusted: adjustedRisk !== risk,
+          originalRisk: risk,
+          adjustedRisk,
+          insurancePriority
+        }
+      },
       budgetPlan,
-      insuranceRecommendation,
+      insuranceRecommendation: {
+        ...insuranceRecommendation,
+        priority: insurancePriority
+      },
       investmentPortfolio,
       stockRecommendations,
       sellAnalysis,
       goalPlanning: { goals: goalsPlanned },
       charts,
-      nextActions
+      nextActions,
+      // Apply discipline multiplier to overall assessment
+      overallHealthScore: Math.round(75 * disciplineMultiplier) // Base score of 75
     };
 
     return NextResponse.json(response);

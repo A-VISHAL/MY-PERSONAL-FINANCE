@@ -4,14 +4,35 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, AreaChart, Area, ComposedChart
 } from 'recharts';
 import { Shield, TrendingUp, AlertTriangle, CheckCircle, BarChart3, Download, X, Briefcase, Plus } from 'lucide-react';
+import {
+    InsuranceAdequacyOverlay,
+    RiskAlignmentOverlay,
+    ProtectionFirstWarning,
+    EmergencyFundStressTest,
+    ScoreBoostSimulator,
+    PriorityTagging,
+    TimeBasedRecommendations,
+    FinancialHealthBadge,
+    InsightConfidenceMeter
+} from './FinancialOverlays';
+import {
+    DisciplineScoreGauge,
+    DisciplineTrendChart,
+    ExpenseIncomeTrendChart,
+    SavingsConsistencyChart,
+    InsuranceAdequacyChart,
+    FinancialScorecardRadar
+} from './FinancialDiscipline';
+import { WealthWiseAIDashboard } from './WealthWiseAI';
 
 interface DashboardProps {
     data: any;
+    userData?: any; // Add userData prop for overlay features
 }
 
 const COLORS = ['#6366f1', '#a855f7', '#ec4899', '#f43f5e', '#10b981', '#fbbf24'];
 
-export default function Dashboard({ data }: DashboardProps) {
+export default function Dashboard({ data, userData = {} }: DashboardProps) {
     const [selectedStock, setSelectedStock] = useState<any>(null);
     const [portfolio, setPortfolio] = useState<any[]>([]);
     const [buyModal, setBuyModal] = useState({ isOpen: false, stock: null as any, quantity: 1 });
@@ -48,13 +69,15 @@ export default function Dashboard({ data }: DashboardProps) {
     if (!data) return null;
 
     const {
+        financialDiscipline, // NEW
         budgetPlan,
         insuranceRecommendation,
         investmentPortfolio,
         stockRecommendations,
         charts,
         goalPlanning,
-        nextActions
+        nextActions,
+        overallHealthScore // NEW
     } = data;
 
     // Combine history and future for the chart
@@ -181,8 +204,48 @@ export default function Dashboard({ data }: DashboardProps) {
                 </div>
             )}
 
+            {/* 🚀 NEW: Financial Discipline Section (FIRST - Most Important) */}
+            <div className="space-y-6">
+                <div className="text-center mb-8">
+                    <h2 className="text-2xl font-bold mb-2">Financial Discipline Assessment</h2>
+                    <p className="text-gray-400">Your financial behavior analysis (0-100%) based on lifetime career data</p>
+                </div>
+
+                {/* Primary Discipline Gauge */}
+                <DisciplineScoreGauge userData={userData} />
+
+                {/* Discipline Analysis Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <DisciplineTrendChart userData={userData} />
+                    <ExpenseIncomeTrendChart userData={userData} />
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <SavingsConsistencyChart userData={userData} />
+                    <InsuranceAdequacyChart data={data} userData={userData} />
+                </div>
+
+                {/* Overall Financial Health Radar */}
+                <FinancialScorecardRadar data={data} userData={userData} />
+
+                {/* Discipline-Based Adjustments Alert */}
+                {financialDiscipline?.adjustments?.riskAdjusted && (
+                    <div className="p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-3">
+                        <AlertTriangle size={16} className="text-yellow-400 mt-0.5 flex-shrink-0" />
+                        <div>
+                            <h4 className="text-sm font-semibold text-yellow-400 mb-1">Risk Profile Adjusted</h4>
+                            <p className="text-xs text-yellow-300/80 leading-relaxed">
+                                Based on your financial discipline score ({financialDiscipline.score}%), we've adjusted your risk profile from 
+                                <span className="font-medium"> {financialDiscipline.adjustments.originalRisk}</span> to 
+                                <span className="font-medium"> {financialDiscipline.adjustments.adjustedRisk}</span> for safer recommendations.
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+
             {/* 1. Summary Header */}{/* Keep comment */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <div className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg">
                     <h3 className="text-gray-400 text-sm mb-1">Monthly Budget</h3>
                     <p className="text-2xl font-bold">₹{budgetPlan.monthlyAllocation.needs.amount + budgetPlan.monthlyAllocation.wants.amount + budgetPlan.monthlyAllocation.savings.amount}</p>
@@ -198,14 +261,48 @@ export default function Dashboard({ data }: DashboardProps) {
                 <div className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg">
                     <h3 className="text-gray-400 text-sm mb-1">Risk Profile</h3>
                     <p className="text-2xl font-bold capitalize text-accent">{investmentPortfolio.riskProfile}</p>
-                    <span className="text-xs text-gray-500">Asset Allocation Strategy</span>
+                    <span className="text-xs text-gray-500">
+                        {investmentPortfolio.disciplineAdjusted ? 'Discipline Adjusted' : 'Asset Allocation Strategy'}
+                    </span>
                 </div>
                 <div className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg">
-                    <h3 className="text-gray-400 text-sm mb-1">Inv. to Start</h3>
+                    <h3 className="text-gray-400 text-sm mb-1">Monthly SIP</h3>
                     <p className="text-2xl font-bold text-primary">₹{investmentPortfolio.totalMonthlyInvestment}</p>
-                    <span className="text-xs text-gray-500">Monthly SIP Amount</span>
+                    <span className="text-xs text-gray-500">Investment Amount</span>
+                </div>
+                <div className="p-6 rounded-2xl bg-card border border-white/5 shadow-lg">
+                    <h3 className="text-gray-400 text-sm mb-1">Overall Health Score</h3>
+                    <p className="text-2xl font-bold text-primary">{overallHealthScore || 75}</p>
+                    <span className="text-xs text-gray-500">
+                        {financialDiscipline?.adjustments?.riskAdjusted ? 'Discipline Adjusted' : 'Base Score'}
+                    </span>
                 </div>
             </div>
+
+            {/* 🚀 NEW: Intelligent Overlay Features */}
+            <div className="space-y-6">
+                {/* Protection-First Warning (shows only when needed) */}
+                <ProtectionFirstWarning data={data} userData={userData} />
+                
+                {/* Financial Health Badge & Priority Actions */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FinancialHealthBadge data={data} userData={userData} />
+                    <PriorityTagging data={data} userData={userData} />
+                    <InsightConfidenceMeter data={data} userData={userData} />
+                </div>
+
+                {/* Advanced Overlays Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <InsuranceAdequacyOverlay data={data} userData={userData} />
+                    <RiskAlignmentOverlay data={data} userData={userData} />
+                    <EmergencyFundStressTest data={data} userData={userData} />
+                    <ScoreBoostSimulator data={data} userData={userData} />
+                    <TimeBasedRecommendations data={data} userData={userData} />
+                </div>
+            </div>
+
+            {/* 🤖 WealthWise AI - Dream-Driven Discipline Features */}
+            <WealthWiseAIDashboard data={data} userData={userData} />
 
             {/* 2. Charts Section (Portfolio & Growth) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

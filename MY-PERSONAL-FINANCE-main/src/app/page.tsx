@@ -7,6 +7,7 @@ import Dashboard from '@/components/Dashboard';
 
 export default function Home() {
   const [results, setResults] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null); // Store form data for overlays
   const [isLoading, setIsLoading] = useState(false);
 
   const [quote, setQuote] = useState("");
@@ -29,6 +30,7 @@ export default function Home() {
 
   const handleAnalysis = async (formData: any) => {
     setIsLoading(true);
+    setUserData(formData); // Store form data for overlay features
     try {
       const response = await fetch('/api/analyze', {
         method: 'POST',
@@ -88,7 +90,7 @@ export default function Home() {
               <p className="text-gray-400">Generated on {new Date().toLocaleDateString()}</p>
             </div>
 
-            <Dashboard data={results} />
+            <Dashboard data={results} userData={userData} />
           </div>
         </section>
       )}
